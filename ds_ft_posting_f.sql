@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS ds.ft_posting_f (
-	oper_date			DATE not null,
+	oper_date		DATE not null,
 	credit_account_rk	INT not null,
 	debet_account_rk	INT not null,
 	credit_amount		NUMERIC(19,2),
