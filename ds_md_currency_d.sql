@@ -1,10 +1,10 @@
 CREATE TABLE IF NOT EXISTS ds.md_currency_d (
-    currency_rk				INT not null,
-	data_actual_date		DATE not null,
-    data_actual_end_date	DATE,
-    currency_code			VARCHAR(3),
-	code_iso_char			VARCHAR(3),
-    PRIMARY KEY				(currency_rk,data_actual_date)
+	currency_rk		INT not null,
+	data_actual_date	DATE not null,
+    	data_actual_end_date	DATE,
+    	currency_code		VARCHAR(3),
+	code_iso_char		VARCHAR(3),
+    	PRIMARY KEY		(currency_rk,data_actual_date)
 );
 
 MERGE INTO ds.md_currency_d AS d 
