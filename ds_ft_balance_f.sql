@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS ds.ft_balance_f (
 	on_date DATE not null, 
 	account_rk INT not null, 
 	currency_rk INT, 
-	balance_out FLOAT, 
+	balance_out NUMERIC(19,2), 
 	PRIMARY KEY(on_date, account_rk)
 );
 
