@@ -49,28 +49,22 @@ with DAG(
         task_id = "start"
     )
 
-    delay_python_task = PythonOperator(
-        task_id="delay_python_task", 
+    pause_five_sec = PythonOperator(
+        task_id="pause_five_sec", 
         python_callable=lambda: time.sleep(5)
     )
 
     create_schema = SQLExecuteQueryOperator(
         task_id="create_schema",
         conn_id="postgres-db",
-        sql="CREATE SCHEMA IF NOT EXISTS logs; CREATE TABLE IF NOT EXISTS logs.log_import (type bit, dt timestamp); CREATE SCHEMA IF NOT EXISTS ds; CREATE SCHEMA IF NOT EXISTS stage;"
+        sql="CREATE SCHEMA IF NOT EXISTS ds; CREATE SCHEMA IF NOT EXISTS logs; CREATE SCHEMA IF NOT EXISTS stage;"
     )
 
     logs_import_begin = SQLExecuteQueryOperator(
         task_id="logs_import_begin",
         conn_id="postgres-db",
-        sql="INSERT INTO logs.log_import (type, dt) VALUES (cast(0 as bit),NOW());"    
+        sql="CREATE TABLE IF NOT EXISTS logs.log_import (type bit, dt timestamp); INSERT INTO logs.log_import (type, dt) VALUES (cast(0 as bit),NOW());"    
     )    
-
-    logs_import_end = SQLExecuteQueryOperator(
-        task_id="logs_import_end",
-        conn_id="postgres-db",
-        sql="INSERT INTO logs.log_import (type, dt) VALUES (cast(1 as bit),NOW());"    
-    ) 
 
     ft_balance_f = PythonOperator(
         task_id="ft_balance_f",
@@ -148,6 +142,12 @@ with DAG(
         sql="sql/ds_md_ledger_account_s.sql"
     ) 
 
+    logs_import_end = SQLExecuteQueryOperator(
+        task_id="logs_import_end",
+        conn_id="postgres-db",
+        sql="INSERT INTO logs.log_import (type, dt) VALUES (cast(1 as bit),NOW());"    
+    )    
+
     end = DummyOperator(
         task_id = "end"
     )
@@ -156,7 +156,7 @@ with DAG(
         start 
         >> create_schema
         >> logs_import_begin
-        >> delay_python_task
+        >> pause_five_sec
         >> [ft_balance_f,ft_posting_f,md_account_d,md_currency_d,md_exchange_rate_d,md_ledger_account_s]
         >> split
         >> [merge_ds_ft_balance_f,insert_ds_ft_posting_f,merge_ds_md_account_d,merge_ds_md_currency_d,merge_ds_md_exchange_rate_d,merge_ds_md_ledger_account_s]
